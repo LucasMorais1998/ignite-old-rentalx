@@ -1,0 +1,47 @@
+# Arquivos temporários
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Logs e arquivos de depuração
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+logs
+*.log
+*.log.*
+*.log-*
+*.pid
+*.seed
+*.pid.lock
+npm-debug.log
+yarn.lock
+
+# Diretório node_modules
+node_modules/
+
+# Arquivos de build
+dist/
+build/
+out/
+
+# Dependências específicas de um ambiente (exemplo: Python)
+.env
+.env.local
+.env.*.local
+
+# Arquivos de configuração
+npm-debug.log
+yarn-error.log
+.env.production
+.env.development
+.env.test
+
+# Arquivos de cache
+.cache/
+yarn-error.log
+
+# Dependências locais do Visual Studio Code
+.vscode/
