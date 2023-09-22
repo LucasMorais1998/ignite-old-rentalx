@@ -45,3 +45,6 @@ yarn-error.log
 
 # Dependências locais do Visual Studio Code
 .vscode/
+
+# my
+notes.md
