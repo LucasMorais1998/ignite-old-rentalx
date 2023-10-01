@@ -15,6 +15,7 @@
         "summary": "Create a category",
         "description": "Create a new category",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -107,6 +108,7 @@
         "summary": "Create a specification",
         "description": "Create a new specification",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
