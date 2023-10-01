@@ -73,6 +73,34 @@
         }
       }
     },
+    "/categories/import": {
+      "post": {
+        "tags": ["Category Import"],
+        "summary": "Import a file",
+        "description": "Import a category file",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/specifications": {
       "post": {
         "tags": ["Specification"],
