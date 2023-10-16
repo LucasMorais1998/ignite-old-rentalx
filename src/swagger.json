@@ -19,19 +19,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  }
-                },
-                "example": {
-                  "name": "Category name sample",
-                  "description": "Category description sample"
-                }
+                "$ref": "#/definitions/Category"
               }
             }
           }
@@ -76,9 +64,9 @@
     },
     "/categories/import": {
       "post": {
-        "tags": ["Category Import"],
-        "summary": "Import a file",
-        "description": "Import a category file",
+        "tags": ["Category"],
+        "summary": "Upload a new category",
+        "description": "Upload a new category",
         "requestBody": {
           "required": true,
           "content": {
@@ -112,19 +100,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "description": {
-                    "type": "string"
-                  }
-                },
-                "example": {
-                  "name": "Specification name sample",
-                  "description": "Specification description sample"
-                }
+                "$ref": "#/definitions/Specification"
               }
             }
           }
@@ -134,9 +110,41 @@
             "description": "Created"
           },
           "500": {
-            "description": "Specification already exists"
+            "description": "Specification already exists!"
           }
         }
+      }
+    }
+  },
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "name": "Category name sample",
+        "description": "Category description sample"
+      }
+    },
+    "Specification": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "name": "Specification name sample",
+        "description": "Specification description sample"
       }
     }
   }
