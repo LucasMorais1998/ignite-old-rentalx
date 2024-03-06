@@ -49,3 +49,4 @@ yarn-error.log
 # my
 notes.md
 tmp/
+coverage/
