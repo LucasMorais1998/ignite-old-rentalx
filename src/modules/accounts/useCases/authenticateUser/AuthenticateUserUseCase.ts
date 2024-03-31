@@ -1,3 +1,5 @@
+import { IUsersRepository } from '@modules/accounts/repositories/IUsersRepository';
+import { AppError } from '@shared/errors/AppError';
 import { compare } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
@@ -27,15 +29,11 @@ class AuthenticateUserUseCase {
   async execute({ email, password }: IRequest): Promise<IResponse> {
     const user = await this.usersRepository.findByEmail(email);
 
-    if (!user) {
-      throw new AppError('Email or password incorrect');
-    }
+    if (!user) throw new AppError('Email or password incorrect');
 
     const passwordMatch = await compare(password, user.password);
 
-    if (!passwordMatch) {
-      throw new AppError('Email or password incorrect');
-    }
+    if (!passwordMatch) throw new AppError('Email or password incorrect');
 
     const token = sign({}, 'd41d8cd98f00b204e9800998ecf8427e', {
       subject: user.id,
