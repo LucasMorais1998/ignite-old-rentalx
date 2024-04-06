@@ -13,5 +13,6 @@
       "@middlewares/*": ["middlewares/*"]
     },
     "resolveJsonModule": true,
+    "esModuleInterop": true
   }
 }
