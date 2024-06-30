@@ -3,7 +3,7 @@ import { CreateCarController } from '@modules/cars/useCases/createCar/CreateCarC
 import { CreateCarSpecificationController } from '@modules/cars/useCases/createCarSpecification/CreateCarSpecificationController';
 import { DeleteCarImagesController } from '@modules/cars/useCases/deleteCarImages/DeleteCarImagesController';
 import { ListAvailableCarsController } from '@modules/cars/useCases/listAvailableCars/ListAvailableCarsController';
-import { UploadCarImagesController } from '@modules/cars/useCases/UploadCarImages/UploadCarImagesController';
+import { UploadCarImagesController } from '@modules/cars/useCases/uploadCarImages/UploadCarImagesController';
 import { Router } from 'express';
 import multer from 'multer';
 import { ensureAdmin } from '../middlewares/ensureAdmin';
