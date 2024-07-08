@@ -49,4 +49,28 @@ describe('Create Category', () => {
       });
     }).rejects.toBeInstanceOf(AppError);
   });
+
+  it.each([[''], [undefined], [null]])(
+    'should not be able to create a new category if name is %p',
+    async (categoryName: any) => {
+      await expect(
+        createCategoryUseCase.execute({
+          name: categoryName,
+          description: 'Category description test',
+        })
+      ).rejects.toBeInstanceOf(AppError);
+    }
+  );
+
+  it.each([[''], [undefined], [null]])(
+    'should not be able to create a new category if description is %p',
+    async (categoryDescription: any) => {
+      await expect(
+        createCategoryUseCase.execute({
+          name: 'Category Test',
+          description: categoryDescription,
+        })
+      ).rejects.toBeInstanceOf(AppError);
+    }
+  );
 });
