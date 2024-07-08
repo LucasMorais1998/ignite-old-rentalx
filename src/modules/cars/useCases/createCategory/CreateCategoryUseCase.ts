@@ -15,6 +15,10 @@ class CreateCategoryUseCase {
   ) {}
 
   async execute({ name, description }: IRequest): Promise<void> {
+    if (!name || !description) {
+      throw new AppError('Category name and category description are required');
+    }
+
     const categoryAlreadyExists = await this.categoriesRepository.findByName(
       name
     );
