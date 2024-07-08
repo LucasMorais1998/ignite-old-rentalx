@@ -1,4 +1,5 @@
 import { CarsRepositoryInMemory } from '@modules/cars/repositories/in-memory/CarsRepositoryInMemory';
+import { makeCar } from '@shared/__tests__/factories/makeCar';
 import { ListAvailableCarsUseCase } from './ListAvailableCarsUseCase';
 
 let listAvailableCarsUseCase: ListAvailableCarsUseCase;
@@ -7,76 +8,97 @@ let carsRepositoryInMemory: CarsRepositoryInMemory;
 describe('List Available Cars', () => {
   beforeEach(() => {
     carsRepositoryInMemory = new CarsRepositoryInMemory();
-    listAvailableCarsUseCase = new ListAvailableCarsUseCase(carsRepositoryInMemory);
+
+    carsRepositoryInMemory = ({
+      findAvailable: jest.fn(),
+    } as unknown) as CarsRepositoryInMemory;
+
+    listAvailableCarsUseCase = new ListAvailableCarsUseCase(
+      carsRepositoryInMemory
+    );
   });
 
   it('should be able to list all available cars', async () => {
-    const car = await carsRepositoryInMemory.create({
-      name: 'Car_1',
-      description: 'Car_description_1',
-      daily_rate: 110.0,
-      license_plate: 'license_plate_1',
-      fine_amount: 10,
-      brand: 'Car_brand_1',
-      category_id: 'category_id_1',
-    });
+    const expectedCarsList = [makeCar(), makeCar()];
 
-    const cars = await listAvailableCarsUseCase.execute({});
+    (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
+      expectedCarsList
+    );
 
-    expect(cars).toEqual([car]);
+    const result = await listAvailableCarsUseCase.execute({});
+
+    expect(carsRepositoryInMemory.findAvailable).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      undefined
+    );
+    expect(result).toEqual(expectedCarsList);
   });
 
   it('should be able to list all available cars by category', async () => {
-    const car = await carsRepositoryInMemory.create({
-      name: 'Car_2',
-      description: 'Car_description_2',
-      daily_rate: 220.0,
-      license_plate: 'license_plate_2',
-      fine_amount: 20,
-      brand: 'Car_brand_2',
-      category_id: 'category_id_2',
-    });
+    const category_id = 'Category id Test';
+    const expectedCarsList = [makeCar({ category_id: category_id })];
 
-    const cars = await listAvailableCarsUseCase.execute({
-      category_id: 'category_id_2',
-    });
+    (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
+      expectedCarsList
+    );
 
-    expect(cars).toEqual([car]);
+    const result = await listAvailableCarsUseCase.execute({ category_id });
+
+    expect(carsRepositoryInMemory.findAvailable).toHaveBeenCalledWith(
+      category_id,
+      undefined,
+      undefined
+    );
+    expect(result).toEqual(expectedCarsList);
   });
 
   it('should be able to list all available cars by brand', async () => {
-    const car = await carsRepositoryInMemory.create({
-      name: 'Car_3',
-      description: 'Car_description_3',
-      daily_rate: 330.0,
-      license_plate: 'license_plate_3',
-      fine_amount: 30,
-      brand: 'Car_brand_3',
-      category_id: 'category_id_3',
-    });
+    const brand = 'Brand Test A';
+    const expectedCarsList = [makeCar({ brand: brand })];
 
-    const cars = await listAvailableCarsUseCase.execute({
-      brand: 'Car_brand_3',
-    });
+    (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
+      expectedCarsList
+    );
 
-    expect(cars).toEqual([car]);
+    const result = await listAvailableCarsUseCase.execute({ brand });
+
+    expect(carsRepositoryInMemory.findAvailable).toHaveBeenCalledWith(
+      undefined,
+      brand,
+      undefined
+    );
+    expect(result).toEqual(expectedCarsList);
   });
 
   it('should be able to list all available cars by name', async () => {
-    const car = await carsRepositoryInMemory.create({
-      name: 'Car_4',
-      description: 'Car_description_4',
-      daily_rate: 440.0,
-      license_plate: 'license_plate_4',
-      fine_amount: 40,
-      brand: 'Car_brand_4',
-      category_id: 'category_id_4',
-    });
+    const name = 'Car Test';
+    const expectedCarsList = [makeCar({ name: name })];
 
-    const cars = await listAvailableCarsUseCase.execute({
-      name: 'Car_4',
-    });
+    (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
+      expectedCarsList
+    );
 
-    expect(cars).toEqual([car]);
+    const result = await listAvailableCarsUseCase.execute({ name });
+
+    expect(carsRepositoryInMemory.findAvailable).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      name
+    );
+    expect(result).toEqual(expectedCarsList);
+  });
+
+  it('should return an empty list if no cars are available', async () => {
+    (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue([]);
+
+    const result = await listAvailableCarsUseCase.execute({});
+
+    expect(carsRepositoryInMemory.findAvailable).toHaveBeenCalledWith(
+      undefined,
+      undefined,
+      undefined
+    );
+    expect(result).toEqual([]);
   });
 });
