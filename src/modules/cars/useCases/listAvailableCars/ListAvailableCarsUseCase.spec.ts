@@ -5,7 +5,7 @@ import { ListAvailableCarsUseCase } from './ListAvailableCarsUseCase';
 let listAvailableCarsUseCase: ListAvailableCarsUseCase;
 let carsRepositoryInMemory: CarsRepositoryInMemory;
 
-describe('List Available Cars', () => {
+describe('List Available Cars Use Case', () => {
   beforeEach(() => {
     carsRepositoryInMemory = new CarsRepositoryInMemory();
 
@@ -36,7 +36,7 @@ describe('List Available Cars', () => {
   });
 
   it('should be able to list all available cars by category', async () => {
-    const category_id = 'Category id Test';
+    const category_id = 'Category Id Test';
     const expectedCarsList = [makeCar({ category_id: category_id })];
 
     (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
@@ -54,7 +54,7 @@ describe('List Available Cars', () => {
   });
 
   it('should be able to list all available cars by brand', async () => {
-    const brand = 'Brand Test A';
+    const brand = 'Brand Test';
     const expectedCarsList = [makeCar({ brand: brand })];
 
     (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
