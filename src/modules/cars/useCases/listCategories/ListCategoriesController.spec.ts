@@ -8,7 +8,7 @@ import { v4 as uuidV4 } from 'uuid';
 
 let connection: Connection;
 
-describe('List Category Controller', () => {
+describe('List Categories Controller', () => {
   beforeAll(async () => {
     connection = await createConnection();
     await connection.runMigrations();

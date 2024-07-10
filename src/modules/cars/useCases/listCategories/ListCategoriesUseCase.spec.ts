@@ -5,7 +5,7 @@ import { ListCategoriesUseCase } from './ListCategoriesUseCase';
 let listCategoriesUseCase: ListCategoriesUseCase;
 let categoriesRepositoryInMemory: CategoriesRepositoryInMemory;
 
-describe('List Categories', () => {
+describe('List Categories Use Case', () => {
   beforeEach(() => {
     categoriesRepositoryInMemory = new CategoriesRepositoryInMemory();
 
@@ -19,16 +19,16 @@ describe('List Categories', () => {
   });
 
   it('it should return a list of categories', async () => {
-    const categories = [makeCategory(), makeCategory()];
+    const expectedCategories = [makeCategory(), makeCategory()];
 
     (<jest.Mock>categoriesRepositoryInMemory.list).mockResolvedValue(
-      categories
+      expectedCategories
     );
 
     const result = await listCategoriesUseCase.execute();
 
     expect(categoriesRepositoryInMemory.list).toHaveBeenCalled();
-    expect(result).toEqual(categories);
+    expect(result).toEqual(expectedCategories);
   });
 
   it('should return an empty list if there are no categories', async () => {
