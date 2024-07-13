@@ -1,10 +1,10 @@
 import { Category } from '@modules/cars/infra/typeorm/entities/Category';
+import { AuthUtils } from '@shared/__tests__/utils/AuthUtils';
+import { DatabaseUtils } from '@shared/__tests__/utils/DatabaseUtils';
 import { app } from '@shared/infra/http/app';
 import createConnection from '@shared/infra/typeorm';
-import { hash } from 'bcrypt';
 import request from 'supertest';
 import { Connection } from 'typeorm';
-import { v4 as uuidV4 } from 'uuid';
 
 let connection: Connection;
 
@@ -13,13 +13,7 @@ describe('List Categories Controller', () => {
     connection = await createConnection();
     await connection.runMigrations();
 
-    const id = uuidV4();
-    const password = await hash('admin', 8);
-
-    await connection.query(
-      `INSERT INTO USERS(id, name, email, password, "isAdmin", created_at, driver_license)
-        values('${id}', 'admin', 'admin@rentalx.com.br', '${password}', true, 'now()', 'XXX-XXXX')`
-    );
+    await DatabaseUtils.createAdminUser(connection);
   });
 
   beforeEach(async () => {
@@ -32,12 +26,7 @@ describe('List Categories Controller', () => {
   });
 
   it('should be able to list all categories', async () => {
-    const responseToken = await request(app).post('/sessions').send({
-      email: 'admin@rentalx.com.br',
-      password: 'admin',
-    });
-
-    const { token } = responseToken.body;
+    const token = await AuthUtils.authenticateAdmin();
 
     await request(app)
       .post('/categories')
