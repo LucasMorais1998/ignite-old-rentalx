@@ -1,7 +1,8 @@
 import { Car } from '@modules/cars/infra/typeorm/entities/Car';
+import { AuthUtils } from '@shared/__tests__/utils/AuthUtils';
+import { DatabaseUtils } from '@shared/__tests__/utils/DatabaseUtils';
 import { app } from '@shared/infra/http/app';
 import createConnection from '@shared/infra/typeorm';
-import { hash } from 'bcrypt';
 import request from 'supertest';
 import { Connection } from 'typeorm';
 import { v4 as uuidV4 } from 'uuid';
@@ -17,35 +18,50 @@ describe('List Available Cars Controller', () => {
     connection = await createConnection();
     await connection.runMigrations();
 
-    const id = uuidV4();
-    const password = await hash('admin', 8);
-    await connection.query(
-      `INSERT INTO USERS(id, name, email, password, "isAdmin", created_at, driver_license)
-        values('${id}', 'admin', 'admin@rentalx.com.br', '${password}', true, 'now()', 'XXX-XXXX')`
-    );
+    await DatabaseUtils.createAdminUser(connection);
 
     genericCategoryId = uuidV4();
-    await connection.query(
-      `INSERT INTO CATEGORIES(id, name, description)
-          values('${genericCategoryId}', 'Generic Category Test', 'Generic category test description')`
+    await DatabaseUtils.createCategory(
+      connection,
+      genericCategoryId,
+      'Generic Category Test',
+      'Generic category test description'
     );
 
     specificCategoryId = uuidV4();
-    await connection.query(
-      `INSERT INTO CATEGORIES(id, name, description)
-          values('${specificCategoryId}', 'Specific Category Test', 'Specific category test description')`
+    await DatabaseUtils.createCategory(
+      connection,
+      specificCategoryId,
+      'Specific Category Test',
+      'Specific category test description'
     );
 
     unavailableCarName = 'Ford Fiesta';
-    await connection.query(
-      `INSERT INTO cars(id, name, description, daily_rate, license_plate, fine_amount, brand, category_id, available)
-        values('${uuidV4()}', '${unavailableCarName}', 'Economy car', 120.0, 'ABC-1234', 50, 'Ford', '${genericCategoryId}', false)`
+    await DatabaseUtils.createCar(
+      connection,
+      uuidV4(),
+      unavailableCarName,
+      'Economy car',
+      120.0,
+      'ABC-1234',
+      50,
+      'Ford',
+      genericCategoryId,
+      false
     );
 
     unavailableCarBrand = 'BMW';
-    await connection.query(
-      `INSERT INTO cars(id, name, description, daily_rate, license_plate, fine_amount, brand, category_id, available)
-        values('${uuidV4()}', 'Car Test', 'Economy car', 120.0, 'ABC-1234', 50, '${unavailableCarBrand}', '${specificCategoryId}', false)`
+    await DatabaseUtils.createCar(
+      connection,
+      uuidV4(),
+      'Car Test',
+      'Economy car',
+      120.0,
+      'ABC-1234',
+      50,
+      unavailableCarBrand,
+      specificCategoryId,
+      false
     );
   });
 
@@ -58,16 +74,22 @@ describe('List Available Cars Controller', () => {
     await connection.query('DELETE FROM cars');
   });
 
-  it('should return a list of available cars', async () => {
-    const responseToken = await request(app).post('/sessions').send({
-      email: 'admin@rentalx.com.br',
-      password: 'admin',
-    });
+  const postCars = async (token: string, cars: Partial<Car>[]) => {
+    for (const car of cars) {
+      await request(app)
+        .post('/cars')
+        .send(car)
+        .set({
+          authorization: `Bearer ${token}`,
+        });
+    }
+  };
 
-    const { token } = responseToken.body;
+  it('should return a list of available cars', async () => {
+    const token = await AuthUtils.authenticateAdmin();
 
     const expectedCategoryId = genericCategoryId;
-    const newCars = [
+    const newCarsData = [
       {
         name: 'BMW 320i',
         description: 'BMW car',
@@ -97,14 +119,7 @@ describe('List Available Cars Controller', () => {
       },
     ];
 
-    for (const newCar of newCars) {
-      await request(app)
-        .post('/cars')
-        .send(newCar)
-        .set({
-          authorization: `Bearer ${token}`,
-        });
-    }
+    await postCars(token, newCarsData);
 
     const { body, status } = (await request(app)
       .get('/cars/available')
@@ -119,16 +134,11 @@ describe('List Available Cars Controller', () => {
   });
 
   it('should return a list of available cars for a given category id', async () => {
-    const responseToken = await request(app).post('/sessions').send({
-      email: 'admin@rentalx.com.br',
-      password: 'admin',
-    });
-
-    const { token } = responseToken.body;
+    const token = await AuthUtils.authenticateAdmin();
 
     const expectedCategoryId = genericCategoryId;
     const unexpectedCategoryId = specificCategoryId;
-    const newCars = [
+    const newCarsData = [
       {
         name: 'BMW 320i',
         description: 'BMW car',
@@ -158,14 +168,7 @@ describe('List Available Cars Controller', () => {
       },
     ];
 
-    for (const newCar of newCars) {
-      await request(app)
-        .post('/cars')
-        .send(newCar)
-        .set({
-          authorization: `Bearer ${token}`,
-        });
-    }
+    await postCars(token, newCarsData);
 
     const { body, status } = (await request(app)
       .get('/cars/available')
@@ -184,15 +187,10 @@ describe('List Available Cars Controller', () => {
   });
 
   it('should return a list of available cars for a given name', async () => {
-    const responseToken = await request(app).post('/sessions').send({
-      email: 'admin@rentalx.com.br',
-      password: 'admin',
-    });
-
-    const { token } = responseToken.body;
+    const token = await AuthUtils.authenticateAdmin();
 
     const expectedCarName = 'Ford Mustang';
-    const newCars = [
+    const newCarsData = [
       {
         name: expectedCarName,
         description: 'Muscle car',
@@ -222,14 +220,7 @@ describe('List Available Cars Controller', () => {
       },
     ];
 
-    for (const newCar of newCars) {
-      await request(app)
-        .post('/cars')
-        .send(newCar)
-        .set({
-          authorization: `Bearer ${token}`,
-        });
-    }
+    await postCars(token, newCarsData);
 
     const { body, status } = (await request(app)
       .get('/cars/available')
@@ -248,15 +239,10 @@ describe('List Available Cars Controller', () => {
   });
 
   it('should return a list of available cars for a given brand', async () => {
-    const responseToken = await request(app).post('/sessions').send({
-      email: 'admin@rentalx.com.br',
-      password: 'admin',
-    });
-
-    const { token } = responseToken.body;
+    const token = await AuthUtils.authenticateAdmin();
 
     const expectedCarBrand = 'Tesla';
-    const newCars = [
+    const newCarsData = [
       {
         name: 'Tesla Model S',
         description: 'Electric luxury sedan',
@@ -286,14 +272,7 @@ describe('List Available Cars Controller', () => {
       },
     ];
 
-    for (const newCar of newCars) {
-      await request(app)
-        .post('/cars')
-        .send(newCar)
-        .set({
-          authorization: `Bearer ${token}`,
-        });
-    }
+    await postCars(token, newCarsData);
 
     const { body, status } = (await request(app)
       .get('/cars/available')
