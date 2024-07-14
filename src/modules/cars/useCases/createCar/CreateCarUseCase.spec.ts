@@ -6,20 +6,20 @@ import { CreateCarUseCase } from './CreateCarUseCase';
 let createCarUseCase: CreateCarUseCase;
 let carsRepositoryInMemory: CarsRepositoryInMemory;
 
-describe('Create Car', () => {
+describe('Create Car Use Case', () => {
   beforeEach(() => {
     carsRepositoryInMemory = new CarsRepositoryInMemory();
 
     carsRepositoryInMemory = ({
-      findByLicensePlate: jest.fn(),
       create: jest.fn(),
+      findByLicensePlate: jest.fn(),
     } as unknown) as CarsRepositoryInMemory;
 
     createCarUseCase = new CreateCarUseCase(carsRepositoryInMemory);
   });
 
   it('should be able to create a new car', async () => {
-    const newCarData = {
+    const newCar = {
       name: 'Test Car',
       description: 'A test car',
       daily_rate: 100,
@@ -29,21 +29,21 @@ describe('Create Car', () => {
       category_id: 'test-category-id',
     };
 
-    const expectedNewCar = makeCar(newCarData);
+    const expectedNewCar = makeCar(newCar);
 
     (<jest.Mock>carsRepositoryInMemory.create).mockResolvedValue(
       expectedNewCar
     );
 
-    const result = await createCarUseCase.execute(newCarData);
+    const result = await createCarUseCase.execute(newCar);
 
     expect(carsRepositoryInMemory.create).toHaveBeenCalledTimes(1);
-    expect(carsRepositoryInMemory.create).toHaveBeenCalledWith(newCarData);
+    expect(carsRepositoryInMemory.create).toHaveBeenCalledWith(newCar);
     expect(result).toEqual(expectedNewCar);
   });
 
-  it('should create a new car with available true by default', async () => {
-    const newCarData = {
+  it('should be able to create a new car with available true by default', async () => {
+    const newCar = {
       name: 'Test Car',
       description: 'A test car',
       daily_rate: 100,
@@ -53,23 +53,23 @@ describe('Create Car', () => {
       category_id: 'test-category-id',
     };
 
-    const expectedNewCar = makeCar(newCarData);
+    const expectedNewCar = makeCar(newCar);
 
     (<jest.Mock>carsRepositoryInMemory.create).mockResolvedValue(
       expectedNewCar
     );
 
-    const result = await createCarUseCase.execute(newCarData);
+    const result = await createCarUseCase.execute(newCar);
 
     expect(carsRepositoryInMemory.create).toHaveBeenCalledTimes(1);
-    expect(carsRepositoryInMemory.create).toHaveBeenCalledWith(newCarData);
+    expect(carsRepositoryInMemory.create).toHaveBeenCalledWith(newCar);
     expect(result.available).toEqual(true);
     expect(result).toEqual(expectedNewCar);
   });
 
   it('should not be able to create a car with existing license plate', () => {
     expect(async () => {
-      const newCarData = {
+      const newCar = {
         name: 'Test Car',
         description: 'A test car',
         daily_rate: 100,
@@ -79,13 +79,13 @@ describe('Create Car', () => {
         category_id: 'test-category-id',
       };
 
-      const existingCar = makeCar(newCarData);
+      const existingCar = makeCar(newCar);
 
       (<jest.Mock>carsRepositoryInMemory.findByLicensePlate).mockResolvedValue(
         existingCar
       );
 
-      await createCarUseCase.execute(newCarData);
+      await createCarUseCase.execute(newCar);
     }).rejects.toBeInstanceOf(AppError);
   });
 });

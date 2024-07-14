@@ -35,7 +35,7 @@ describe('Create Car Controller', () => {
     await connection.close();
   });
 
-  it('should be able create a new car', async () => {
+  it('should create a new car successfully', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const newCarData = {
@@ -59,7 +59,7 @@ describe('Create Car Controller', () => {
     expect(createdCar.available).toBe(true);
   });
 
-  it('should not be able to create a car with an existing license plate', async () => {
+  it('should return a 400 error when trying to create a car with a duplicate license plate', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const licensePlate = 'XYZ-1234';
