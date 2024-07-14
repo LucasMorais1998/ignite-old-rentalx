@@ -28,12 +28,14 @@ describe('List Categories Controller', () => {
   it('should be able to list all categories', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
+    const newCategoryData = {
+      name: 'Category Test',
+      description: 'Category test description',
+    };
+
     await request(app)
       .post('/categories')
-      .send({
-        name: 'Category Test',
-        description: 'Category test description',
-      })
+      .send(newCategoryData)
       .set({
         authorization: `Bearer ${token}`,
       });

@@ -18,7 +18,7 @@ describe('List Categories Use Case', () => {
     );
   });
 
-  it('it should return a list of categories', async () => {
+  it('should be able to list categories', async () => {
     const expectedCategories = [makeCategory(), makeCategory()];
 
     (<jest.Mock>categoriesRepositoryInMemory.list).mockResolvedValue(
@@ -29,6 +29,7 @@ describe('List Categories Use Case', () => {
 
     expect(categoriesRepositoryInMemory.list).toHaveBeenCalled();
     expect(result).toEqual(expectedCategories);
+    expect(result).toHaveLength(2);
   });
 
   it('should return an empty list if there are no categories', async () => {
@@ -38,5 +39,6 @@ describe('List Categories Use Case', () => {
 
     expect(categoriesRepositoryInMemory.list).toHaveBeenCalled();
     expect(result).toEqual([]);
+    expect(result).toHaveLength(0);
   });
 });
