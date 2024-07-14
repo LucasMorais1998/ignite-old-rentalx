@@ -1,52 +1,59 @@
 import { CategoriesRepositoryInMemory } from '@modules/cars/repositories/in-memory/CategoriesRepositoryInMemory';
+import { makeCategory } from '@shared/__tests__/factories/makeCategories';
 import { AppError } from '@shared/errors/AppError';
 import { CreateCategoryUseCase } from './CreateCategoryUseCase';
 
 let createCategoryUseCase: CreateCategoryUseCase;
 let categoriesRepositoryInMemory: CategoriesRepositoryInMemory;
 
-describe('Create Category', () => {
+describe('Create Category Use Case', () => {
   beforeEach(() => {
     categoriesRepositoryInMemory = new CategoriesRepositoryInMemory();
+
+    categoriesRepositoryInMemory = ({
+      create: jest.fn(),
+      findByName: jest.fn(),
+    } as unknown) as CategoriesRepositoryInMemory;
+
     createCategoryUseCase = new CreateCategoryUseCase(
       categoriesRepositoryInMemory
     );
   });
 
   it('should be able to create a new category', async () => {
-    const category = {
+    const newCategory = {
       name: 'Category Test',
       description: 'Category description test',
     };
 
-    await createCategoryUseCase.execute({
-      name: category.name,
-      description: category.description,
-    });
+    const newCategoryCreated = makeCategory(newCategory);
 
-    const categoryCreated = await categoriesRepositoryInMemory.findByName(
-      category.name
+    (<jest.Mock>categoriesRepositoryInMemory.create).mockResolvedValue(
+      newCategoryCreated
     );
 
-    expect(categoryCreated).toHaveProperty('id');
+    await createCategoryUseCase.execute(newCategory);
+
+    expect(categoriesRepositoryInMemory.create).toHaveBeenCalledWith({
+      name: newCategory.name,
+      description: newCategory.description,
+    });
   });
 
-  it('should not be able to create a new category with name exists', async () => {
+  it('should not be able to create a new category with a name that already exists', async () => {
     expect(async () => {
-      const category = {
+      const newCategory = {
         name: 'Category Test',
         description: 'Category description test',
       };
 
-      await createCategoryUseCase.execute({
-        name: category.name,
-        description: category.description,
-      });
+      const existingCategory = makeCategory(newCategory);
 
-      await createCategoryUseCase.execute({
-        name: category.name,
-        description: category.description,
-      });
+      (<jest.Mock>categoriesRepositoryInMemory.findByName).mockResolvedValue(
+        existingCategory
+      );
+
+      await createCategoryUseCase.execute(newCategory);
     }).rejects.toBeInstanceOf(AppError);
   });
 
