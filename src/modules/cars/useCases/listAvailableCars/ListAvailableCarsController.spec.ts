@@ -85,7 +85,7 @@ describe('List Available Cars Controller', () => {
     }
   };
 
-  it('should return a list of available cars', async () => {
+  it('should return a list of available cars successfully', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const expectedCategoryId = genericCategoryId;
@@ -133,7 +133,7 @@ describe('List Available Cars Controller', () => {
     body.forEach((car) => expect(car.available).toBe(true));
   });
 
-  it('should return a list of available cars for a given category id', async () => {
+  it('should return only available cars for the specified category', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const expectedCategoryId = genericCategoryId;
@@ -186,7 +186,7 @@ describe('List Available Cars Controller', () => {
     });
   });
 
-  it('should return a list of available cars for a given name', async () => {
+  it('should return only available cars for the specified name', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const expectedCarName = 'Ford Mustang';
@@ -238,7 +238,7 @@ describe('List Available Cars Controller', () => {
     });
   });
 
-  it('should return a list of available cars for a given brand', async () => {
+  it('should return only available cars for the specified brand', async () => {
     const token = await AuthUtils.authenticateAdmin();
 
     const expectedCarBrand = 'Tesla';

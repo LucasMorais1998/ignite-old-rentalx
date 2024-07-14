@@ -33,11 +33,15 @@ describe('List Available Cars Use Case', () => {
       undefined
     );
     expect(result).toEqual(expectedCarsList);
+    expect(result).toHaveLength(2);
   });
 
   it('should be able to list all available cars by category', async () => {
     const category_id = 'Category Id Test';
-    const expectedCarsList = [makeCar({ category_id: category_id })];
+    const expectedCarsList = [
+      makeCar({ category_id: category_id }),
+      makeCar({ category_id: category_id }),
+    ];
 
     (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
       expectedCarsList
@@ -51,11 +55,15 @@ describe('List Available Cars Use Case', () => {
       undefined
     );
     expect(result).toEqual(expectedCarsList);
+    expect(result).toHaveLength(2);
   });
 
   it('should be able to list all available cars by brand', async () => {
     const brand = 'Brand Test';
-    const expectedCarsList = [makeCar({ brand: brand })];
+    const expectedCarsList = [
+      makeCar({ brand: brand }),
+      makeCar({ brand: brand }),
+    ];
 
     (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
       expectedCarsList
@@ -69,11 +77,12 @@ describe('List Available Cars Use Case', () => {
       undefined
     );
     expect(result).toEqual(expectedCarsList);
+    expect(result).toHaveLength(2);
   });
 
   it('should be able to list all available cars by name', async () => {
     const name = 'Car Test';
-    const expectedCarsList = [makeCar({ name: name })];
+    const expectedCarsList = [makeCar({ name: name }), makeCar({ name: name })];
 
     (<jest.Mock>carsRepositoryInMemory.findAvailable).mockResolvedValue(
       expectedCarsList
@@ -87,6 +96,7 @@ describe('List Available Cars Use Case', () => {
       name
     );
     expect(result).toEqual(expectedCarsList);
+    expect(result).toHaveLength(2);
   });
 
   it('should return an empty list if no cars are available', async () => {
@@ -100,5 +110,6 @@ describe('List Available Cars Use Case', () => {
       undefined
     );
     expect(result).toEqual([]);
+    expect(result).toHaveLength(0);
   });
 });
