@@ -1,5 +1,7 @@
 import { CarsRepositoryInMemory } from '@modules/cars/repositories/in-memory/CarsRepositoryInMemory';
 import { SpecificationsRepositoryInMemory } from '@modules/cars/repositories/in-memory/SpecificationsRepositoryInMemory';
+import { makeCar } from '@shared/__tests__/factories/makeCar';
+import { makeSpecification } from '@shared/__tests__/factories/makeSpecification';
 import { AppError } from '@shared/errors/AppError';
 import { CreateCarSpecificationUseCase } from './CreateCarSpecificationUseCase';
 
@@ -7,52 +9,62 @@ let createCarSpecificationUseCase: CreateCarSpecificationUseCase;
 let carsRepositoryInMemory: CarsRepositoryInMemory;
 let specificationsRepositoryInMemory: SpecificationsRepositoryInMemory;
 
-describe('Create Car Specification', () => {
+describe('Create Car Specification Use Case', () => {
   beforeEach(() => {
     carsRepositoryInMemory = new CarsRepositoryInMemory();
+
+    carsRepositoryInMemory = ({
+      create: jest.fn(),
+      findById: jest.fn(),
+    } as unknown) as CarsRepositoryInMemory;
+
     specificationsRepositoryInMemory = new SpecificationsRepositoryInMemory();
+
+    specificationsRepositoryInMemory = ({
+      findByIds: jest.fn(),
+    } as unknown) as SpecificationsRepositoryInMemory;
+
     createCarSpecificationUseCase = new CreateCarSpecificationUseCase(
       carsRepositoryInMemory,
       specificationsRepositoryInMemory
     );
   });
 
-  it('should not be able to add a new specification to a non-existent car', async () => {
-    expect(async () => {
-      const car_id = 'car_id';
-      const specifications_id = ['specification_id'];
+  it('should be able to add a new specification to a car', async () => {
+    const mockCar = makeCar();
+    (<jest.Mock>carsRepositoryInMemory.findById).mockResolvedValue(mockCar);
 
-      await createCarSpecificationUseCase.execute({
-        car_id,
-        specifications_id,
-      });
-    }).rejects.toBeInstanceOf(AppError);
+    const mockSpecification = makeSpecification();
+    (<jest.Mock>specificationsRepositoryInMemory.findByIds).mockResolvedValue([
+      mockSpecification,
+    ]);
+
+    const result = await createCarSpecificationUseCase.execute({
+      car_id: mockCar.id,
+      specifications_id: [mockSpecification.id],
+    });
+
+    console.log(result);
+
+    expect(result).toHaveProperty('specifications');
+    expect(result.specifications).toHaveLength(1);
   });
 
-  it('should be able to add a new specification to the car', async () => {
-    const car = await carsRepositoryInMemory.create({
-      name: 'Car Name',
-      description: 'Car Description',
-      daily_rate: 100,
-      license_plate: 'ABC-1234',
-      fine_amount: 60,
-      brand: 'Car Brand',
-      category_id: 'category_id',
-    });
+  it('should not be able to add a new specification to a non-existent car', async () => {
+    expect(async () => {
+      const invalidCarId = 'invalid-car-id';
 
-    const specification = await specificationsRepositoryInMemory.create({
-      name: 'Test',
-      description: 'Test',
-    });
+      (<jest.Mock>carsRepositoryInMemory.findById).mockResolvedValue(null);
 
-    const specifications_id = [specification.id];
+      const mockSpecification = makeSpecification();
+      (<jest.Mock>(
+        specificationsRepositoryInMemory.findByIds
+      )).mockResolvedValue([mockSpecification]);
 
-    const specificationsCars = await createCarSpecificationUseCase.execute({
-      car_id: car.id,
-      specifications_id: specifications_id,
-    });
-
-    expect(specificationsCars).toHaveProperty('specifications');
-    expect(specificationsCars.specifications.length).toBe(1);
+      await createCarSpecificationUseCase.execute({
+        car_id: invalidCarId,
+        specifications_id: [mockSpecification.id],
+      });
+    }).rejects.toBeInstanceOf(AppError);
   });
 });
