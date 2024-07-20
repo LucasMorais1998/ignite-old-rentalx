@@ -49,7 +49,7 @@ class ImportCategoryUseCase {
   async execute(file: Express.Multer.File): Promise<void> {
     const categories = await this.loadCategories(file);
 
-    categories.map(async (category) => {
+    await Promise.all(categories.map(async (category) => {
       const { name, description } = category;
 
       const existsCategory = await this.categoriesRepository.findByName(name);
@@ -60,7 +60,7 @@ class ImportCategoryUseCase {
           description,
         });
       }
-    });
+    }))
   }
 }
 
