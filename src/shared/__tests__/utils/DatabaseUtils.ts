@@ -25,6 +25,18 @@ class DatabaseUtils {
     );
   }
 
+  static async createSpecification(
+    connection: Connection,
+    id: string,
+    name: string,
+    description: string
+  ) {
+    await connection.query(
+      'INSERT INTO SPECIFICATIONS(id, name, description) VALUES ($1, $2, $3)',
+      [id, name, description]
+    );
+  }
+
   static async createCar(
     connection: Connection,
     id: string,
