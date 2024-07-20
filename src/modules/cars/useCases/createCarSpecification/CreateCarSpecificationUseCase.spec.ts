@@ -44,8 +44,6 @@ describe('Create Car Specification Use Case', () => {
       specifications_id: [mockSpecification.id],
     });
 
-    console.log(result);
-
     expect(result).toHaveProperty('specifications');
     expect(result.specifications).toHaveLength(1);
   });
