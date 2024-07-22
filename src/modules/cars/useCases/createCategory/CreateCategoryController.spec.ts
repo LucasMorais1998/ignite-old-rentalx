@@ -23,6 +23,8 @@ describe('Create Category Controller', () => {
   afterAll(async () => {
     await connection.dropDatabase();
     await connection.close();
+
+    await connection.query('DELETE FROM categories');
   });
 
   it('should create a new category successfully', async () => {
